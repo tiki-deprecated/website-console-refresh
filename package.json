@@ -1,5 +1,5 @@
 {
-  "name": "l0-auth-refresh",
+  "name": "console-refresh",
   "version": "1.0.0",
   "description": "Cloudflare worker for silent-refresh via secure headers",
   "main": "lib/index.js",
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tiki/l0-auth-refresh"
+    "url": "https://github.com/tiki/console-refresh"
   },
   "keywords": [
     "TIKI",
@@ -32,9 +32,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tiki/l0-auth-refresh/issues"
+    "url": "https://github.com/tiki/console-refresh/issues"
   },
-  "homepage": "https://github.com/tiki/l0-auth-refresh#readme",
+  "homepage": "https://github.com/tiki/console-refresh#readme",
   "devDependencies": {
     "@babel/core": "^7.21.4",
     "@babel/preset-env": "^7.21.4",

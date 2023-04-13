@@ -3,8 +3,8 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-import { Headers } from '@cloudflare/workers-types'
-import * as l0Auth from './l0-auth'
+import { Headers } from "@cloudflare/workers-types";
+import * as l0Auth from "./l0-auth";
 
 export default {
   async fetch(
@@ -13,69 +13,58 @@ export default {
     ctx: ExecutionContext
   ): Promise<Response> {
     try {
-      guardMethod(request, env)
-      const refreshToken = getRefreshToken(request.headers, env)
+      guardMethod(request, env);
+      const refreshToken = getRefreshToken(request.headers, env);
       if (refreshToken != null) {
-        const accessToken = await l0Auth.refresh(env.L0_AUTH_URL, refreshToken)
-        let headers: Record<string, string> = getCorsHeaders(env.ORIGIN)
-        headers['Set-Cookie'] =
+        const accessToken = await l0Auth.refresh(env.L0_AUTH_URL, refreshToken);
+        const headers: Record<string, string> = getCorsHeaders(env.ORIGIN);
+        headers["Set-Cookie"] =
           env.COOKIE +
-          '=' +
+          "=" +
           accessToken.refresh_token +
-          '; HttpOnly' +
-          (env.SECURE === 'true' ? '; SECURE' : '')
-        return Response.json(accessToken, {
-          status: 200,
-          headers: headers,
-        })
+          "; HttpOnly" +
+          (env.SECURE === "true" ? "; SECURE" : "");
+        return Response.json(accessToken, { status: 200, headers });
       } else
         return Response.json(
-          { message: 'Missing cookie: ' + env.COOKIE },
-          {
-            status: 400,
-            headers: getCorsHeaders(env.ORIGIN),
-          }
-        )
-    } catch (error: any) {
-      if (error instanceof Response) return error
+          { message: "Missing cookie: " + env.COOKIE },
+          { status: 400, headers: getCorsHeaders(env.ORIGIN) }
+        );
+    } catch (error: unknown) {
+      if (error instanceof Response) return error;
       else {
-        return Response.json(
-          {
-            message: error.toString(),
-          },
-          { status: 500 }
-        )
+        return Response.json({ message: String(error) }, { status: 500 });
       }
     }
   },
-}
+};
 
-function guardMethod(request: Request, env: Env): any {
-  if (request.method === 'OPTIONS') {
+function guardMethod(request: Request, env: Env): void {
+  if (request.method === "OPTIONS") {
     throw new Response(null, {
       status: 200,
       headers: getCorsHeaders(env.ORIGIN),
-    })
-  } else if (request.method !== 'POST') {
-    throw Response.json({ message: 'Not Allowed' }, { status: 405 })
+    });
+  } else if (request.method !== "POST") {
+    throw Response.json({ message: "Not Allowed" }, { status: 405 });
   }
 }
 
 function getRefreshToken(headers: Headers, env: Env): string | null {
-  const cookieHeader = headers.get('cookie')
+  const cookieHeader = headers.get("cookie");
   const raw = cookieHeader
-    ?.split(';')
-    .filter((c) => c.trim().startsWith(env.COOKIE + '='))
-    .pop()
+    ?.split(";")
+    .filter((c) => c.trim().startsWith(env.COOKIE + "="))
+    .pop();
   if (raw != null) {
-    return raw.split('=')[1]
-  } else return null
+    return raw.split("=")[1];
+  } else return null;
 }
 
 function getCorsHeaders(origin: string): Record<string, string> {
   return {
-    'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'OPTIONS, POST',
-    'Access-Control-Allow-Credentials': 'true',
-  }
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "OPTIONS, POST",
+    "Access-Control-Allow-Credentials": "true",
+  };
 }
